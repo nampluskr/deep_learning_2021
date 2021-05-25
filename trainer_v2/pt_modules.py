@@ -1,6 +1,6 @@
 """ [Pytorch user-defined modules and functions]
 - File name: pt_modules.py
-- Last updated: 2021.5.24
+- Last updated: 2021.5.25
 """
 
 import torch
@@ -16,7 +16,63 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 
 
-def acc_fn(y_hat, y):
+def select_condition(images, labels, preds=None, condition=[]):
+    indices = torch.cat([torch.where(labels == lbl)[0] for lbl in condition])
+    if preds is None:
+        return images[indices], labels[indices]
+    else:
+        return images[indices], labels[indices], preds[indices]
+
+
+def select_correct(images, labels, preds):
+    indices = torch.where(labels == preds)[0]
+    return images[indices], labels[indices], preds[indices]
+
+
+def select_incorrect(images, labels, preds):
+    indices = torch.where(labels != preds)[0]
+    return images[indices], labels[indices], preds[indices]
+
+
+def select_incorrect_dataloader(model, dataloader):
+    device = next(model.parameters()).device
+    with torch.no_grad():
+        xs, ys, ys_pred = [], [], []
+        for xi, yi in dataloader:
+            xi, yi = xi.to(device), yi.to(device)
+            yi_pred = model(xi).argmax(-1)
+            x, y, pred = select_incorrect(xi, yi, yi_pred)
+            if y.ndim > 0:
+                xs.append(x.cpu())
+                ys.append(y.cpu())
+                ys_pred.append(pred.cpu())
+
+    return torch.cat(xs), torch.cat(ys), torch.cat(ys_pred)
+
+
+def plot_images(images, labels, pred=None, n_cols=10, width=10):
+    images, labels = images.cpu().numpy(), labels.cpu().numpy()
+    n_rows = images.shape[0] // n_cols + (1 if images.shape[0] % n_cols else 0)
+    height = width * n_rows / n_cols
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(width, height))
+    for i, ax in enumerate(axes.flat):
+        if i < images.shape[0]:
+            ax.imshow(images[i], cmap='gray_r')
+            if pred is None:
+                ax.set_title("[%d]" % labels[i])
+            else:
+                ax.set_title("[%d] -> %d" % (labels[i], pred[i]))
+        ax.set_axis_off()
+    fig.tight_layout()
+    plt.show()
+
+
+# def nll_loss(y_hat, y):
+    # return -y_hat[torch.arange(y.size(0, device=y.device), y)].mean()
+
+
+def accuracy(y_hat, y):
     return torch.eq(y_hat.argmax(-1), y).float().mean()
 
 

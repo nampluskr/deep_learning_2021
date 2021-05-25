@@ -1,6 +1,6 @@
 """ [Tensorflow training codes]
 - File name: tf_train.py
-- Last updated: 2021.5.24
+- Last updated: 2021.5.25
 """
 
 import argparse
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     tf.random.set_seed(seed)
     args = get_args()
 
-    ## Dataloaders
+    ## Dataset
     assert args.model in ('cnn', 'dnn')
     flatten = True if args.model == 'dnn' else False
     train_loader, valid_loader, test_loader = tfmd.get_dataloaders(
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     valid_loss = tfmd.average(loss_fn, model, valid_loader)
     test_loss  = tfmd.average(loss_fn, model, test_loader)
 
-    train_acc = tfmd.average(tfmd.acc_fn, model, train_loader)
-    valid_acc = tfmd.average(tfmd.acc_fn, model, valid_loader)
-    test_acc  = tfmd.average(tfmd.acc_fn, model, test_loader)
+    train_acc = tfmd.average(tfmd.accuracy, model, train_loader)
+    valid_acc = tfmd.average(tfmd.accuracy, model, valid_loader)
+    test_acc  = tfmd.average(tfmd.accuracy, model, test_loader)
 
     print(">> train_loss = %.4f, train_acc = %.4f" % (train_loss, train_acc))
     print(">> valid_loss = %.4f, valid_acc = %.4f" % (valid_loss, valid_acc))

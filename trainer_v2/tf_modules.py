@@ -1,6 +1,6 @@
 """ [Tensorflow user-defined modules and functions]
 - File name: tf_modules.py
-- Last updated: 2021.5.24
+- Last updated: 2021.5.25
 """
 
 import tensorflow as tf
@@ -10,8 +10,53 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 
 
+def select_condition(images, labels, preds=None, condition=[]):
+    indices = tf.squeeze(tf.concat(
+            [tf.where(labels == lbl) for lbl in condition], axis=0))
+    if preds is None:
+        return tf.gather(images, indices), tf.gather(labels, indices)
+    else:
+        return tf.gather(images, indices), tf.gather(labels, indices), \
+            tf.gather(preds, indices)
+
+
+def select_incorrect(images, labels, preds):
+    indices = tf.squeeze(tf.where(labels != preds))
+    return tf.gather(images, indices), tf.gather(labels, indices), \
+        tf.gather(preds, indices)
+
+
+def select_incorrect_dataloader(model, dataloader):
+    xs, ys, ys_pred = [], [], []
+    for xi, yi in dataloader:
+        yi_pred = tf.argmax(model(xi), -1)
+        x, y, pred = select_incorrect(xi, yi, yi_pred)
+        if y.ndim > 0:
+            xs.append(x)
+            ys.append(y)
+            ys_pred.append(pred)
+    return tf.concat(xs, 0), tf.concat(ys, 0), tf.concat(ys_pred, 0)
+
+
+def plot_images(images, labels, pred=None, n_cols=10, width=10):
+    n_rows = images.shape[0] // n_cols + (1 if images.shape[0] % n_cols else 0)
+    height = width * n_rows / n_cols
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(width, height))
+    for i, ax in enumerate(axes.flat):
+        if i < images.shape[0]:
+            ax.imshow(images[i], cmap='gray_r')
+            if pred is None:
+                ax.set_title("[%d]" % labels[i])
+            else:
+                ax.set_title("[%d] -> %d" % (labels[i], pred[i]))
+        ax.set_axis_off()
+    fig.tight_layout()
+    plt.show()
+
+
 # tf.keras.metrics.Accuracy(name='accuracy', dtype=None)
-def acc_fn(y, y_hat):
+def accuracy(y, y_hat):
     return tf.reduce_mean(tf.cast(tf.equal(tf.argmax(y_hat, 1), y), tf.float32))
 
 

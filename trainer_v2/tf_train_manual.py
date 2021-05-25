@@ -1,6 +1,6 @@
 """ [Tensorflow manual training codes]
 - File name: tf_train_manual.py
-- Last updated: 2021.5.24
+- Last updated: 2021.5.25
 """
 
 import tensorflow as tf
@@ -163,9 +163,9 @@ if __name__ == "__main__":
     valid_loss = tfmd.average(loss_fn, model, (x_valid, y_valid), batch_size)
     test_loss  = tfmd.average(loss_fn, model, (x_test, y_test), batch_size)
 
-    train_acc = tfmd.average(tfmd.acc_fn, model, (x_train, y_train), batch_size)
-    valid_acc = tfmd.average(tfmd.acc_fn, model, (x_valid, y_valid), batch_size)
-    test_acc  = tfmd.average(tfmd.acc_fn, model, (x_test, y_test), batch_size)
+    train_acc = tfmd.average(tfmd.accuracy, model, (x_train, y_train), batch_size)
+    valid_acc = tfmd.average(tfmd.accuracy, model, (x_valid, y_valid), batch_size)
+    test_acc  = tfmd.average(tfmd.accuracy, model, (x_test, y_test), batch_size)
 
     print(">> train_loss = %.4f, train_acc = %.4f" % (train_loss, train_acc))
     print(">> valid_loss = %.4f, valid_acc = %.4f" % (valid_loss, valid_acc))

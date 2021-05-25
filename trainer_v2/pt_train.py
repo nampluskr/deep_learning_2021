@@ -1,6 +1,6 @@
 """ [Pytorch training codes]
 - File name: pt_train.py
-- Last updated: 2021.5.24
+- Last updated: 2021.5.25
 """
 
 import argparse
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args = get_args()
 
-    ## Dataloaders
+    ## Dataset
     assert args.model in ('cnn', 'dnn')
     flatten = True if args.model == 'dnn' else False
     train_loader, valid_loader, test_loader = ptmd.get_dataloaders(
@@ -64,9 +64,9 @@ if __name__ == "__main__":
     valid_loss = ptmd.average(loss_fn, model, valid_loader)
     test_loss  = ptmd.average(loss_fn, model, test_loader)
 
-    train_acc = ptmd.average(ptmd.acc_fn, model, train_loader)
-    valid_acc = ptmd.average(ptmd.acc_fn, model, valid_loader)
-    test_acc  = ptmd.average(ptmd.acc_fn, model, test_loader)
+    train_acc = ptmd.average(ptmd.accuracy, model, train_loader)
+    valid_acc = ptmd.average(ptmd.accuracy, model, valid_loader)
+    test_acc  = ptmd.average(ptmd.accuracy, model, test_loader)
 
     print(">> train_loss = %.4f, train_acc = %.4f" % (train_loss, train_acc))
     print(">> valid_loss = %.4f, valid_acc = %.4f" % (valid_loss, valid_acc))
