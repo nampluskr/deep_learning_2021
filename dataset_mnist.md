@@ -1,7 +1,6 @@
 # Dataset
 
 ## User-defined Functions
----
 
 ### 데이터 파일 다운로드
 ```python
@@ -44,7 +43,6 @@ def load(file_path, image=False):
 ```
 
 ## MNIST Dataset
----
 ### 데이터셋 불러오기
 ```python
 def load_mnist(data_path, download=False):
@@ -93,8 +91,6 @@ print(class_names)
 ```
 
 ## Fashion MNIST Dataset
----
-
 ### 데이터셋 불러오기
 ```python
 def load_fashion_mnist(data_path, download=False):
@@ -142,10 +138,7 @@ class_names = load_class_names()
 print(class_names)
 ```
 
-
 ## Extened MNIST
----
-
 ### 파일 이름 딕셔너리
 ```python
 emnist = dict(
